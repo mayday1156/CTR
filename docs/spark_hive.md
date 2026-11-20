@@ -106,7 +106,7 @@ Windows 本地无 HDFS，Spark 写文件时 Hadoop 层会找 `winutils.exe`（�
 - **仅最终「落盘」这一 I/O** 在 Windows 下退化为 `toPandas()` + pyarrow 写，
   结果 schema 与集群版完全一致。
 
-若你本机有 `winutils.exe`（放入 `C:\hadoop\bin` 并设 `HADOOP_HOME=C:\hadoop`），
+若本机装有 `winutils.exe`（放入 `C:\hadoop\bin` 并设 `HADOOP_HOME=C:\hadoop`），
 脚本会自动走纯 Spark 写路径，无需任何改动。
 
 ## 五、上集群（生产）
