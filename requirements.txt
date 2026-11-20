@@ -6,6 +6,10 @@ numpy>=1.24
 pandas>=2.0
 pyarrow>=14
 
+# 分布式数据工程（可选，Hive/Spark 链路用，需 JDK 17）
+#   pip install pyspark
+pyspark>=3.5
+
 # 模型（CPU 版 torch 可单独装到 vendor/ 目录）
 #   pip install torch --index-url https://download.pytorch.org/whl/cpu
 torch>=2.0

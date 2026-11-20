@@ -4,7 +4,7 @@
 
 - **前端**：多页面网站 + 工作台单页应用（Vue3 + ECharts + 自建设计系统）
 - **后端**：FastAPI + Uvicorn
-- **数据**：Parquet + 实时聚合（对齐阿里 Ali-CCP 数据契约）
+- **数据**：Parquet + 实时聚合（对齐阿里 Ali-CCP 数据契约）；生产级分布式链路见 `sql/warehouse.sql`（Hive 数仓）+ `spark/`（PySpark 特征工程）
 - **模型**：DeepFM（CTR + CVR 双任务）+ LR / GBDT 基线
 
 ## 网站结构
@@ -110,6 +110,24 @@ bash train_real.sh
 - 数据源由 **`config.DATA_SUBDIR`** 决定（`mock` / `real`），默认 `mock`。
 - 优先级：环境变量 `ALI_CCP_DATA` > 状态文件 `data/active_source.json` > 默认 `mock`。
 - 后端 `POST /api/reload` 可在不重启的情况下切换数据源并重载模型；`GET /api/meta` 返回当前数据源与模型来源/训练时间，供前端展示。
+
+## Hive / Spark 分布式数据工程
+
+本项目在「pandas 单机开发」之外，提供了一条**一一对应的生产分布式链路**（同一数据契约，下游 DeepFM 训练零改动切换）：
+
+- **`sql/warehouse.sql`** —— Hive 数仓四层分层建模（ODS→DWD→DWS→ADS），feature_list 三层编码展开 + 维度历史 CTR/CVR 聚合
+- **`spark/etl_features.py`** —— PySpark 训练样本 ETL（读 → explode 展开 → groupBy 聚合 → broadcast join → 落盘），本地可跑
+- **`spark/build_vocab.py`** —— PySpark 分布式词表构建（flatMap + reduceByKey 统计频次）
+
+本地验证（需 JDK 17 + `pip install pyspark`）：
+
+```bash
+export JAVA_HOME="/c/Program Files/Eclipse Adoptium/jdk-17.0.21.9-hotspot"  # Windows
+python spark/etl_features.py --input data/real --output data/spark_output --local 2
+python spark/build_vocab.py    --input data/real --output data/spark_vocab --min-count 3 --local 2
+```
+
+集群提交用 `spark-submit --master yarn`（详见 `docs/spark_hive.md`）。
 
 ## 部署上线（变成真正的网站）
 

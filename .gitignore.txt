@@ -1,0 +1,37 @@
+# ===== 运行时依赖（体积大，不应提交）=====
+vendor/
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+*.so
+*.pyd
+
+# ===== 虚拟环境 =====
+.venv/
+venv/
+env/
+
+# ===== 环境与密钥 =====
+.env
+*.pem
+*.key
+
+# ===== 日志与临时文件 =====
+*.log
+*.tmp
+.DS_Store
+
+# ===== 数据大文件（按需取舍）=====
+# 这两个 parquet 超过 50MB，GitHub 会警告。
+# 如果它们是项目运行必需的数据，可以保留；若不想提交，取消下面两行注释：
+# data/real/common_features_test.parquet
+# data/real/common_features_train.parquet
+
+# ===== 编辑器 =====
+.idea/
+.vscode/
