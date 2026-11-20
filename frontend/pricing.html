@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>定价 · CTR Insight</title>
+<link rel="stylesheet" href="/ui/assets/site.css">
+<style>
+  .price-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 40px; }
+  @media (max-width: 800px) { .price-grid { grid-template-columns: 1fr; } }
+  .price-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 32px; text-align: center; position: relative; transition: .2s; }
+  .price-card:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); }
+  .price-card.featured { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary); }
+  .price-card .flag { position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+    background: var(--primary); color: #fff; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+  .price-card h3 { font-size: 18px; margin-bottom: 16px; }
+  .price-card .price { font-size: 40px; font-weight: 800; margin-bottom: 4px; }
+  .price-card .price .unit { font-size: 16px; font-weight: 500; color: var(--text-muted); }
+  .price-card .period { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+  .price-card ul { list-style: none; padding: 0; text-align: left; margin-bottom: 28px; }
+  .price-card ul li { padding: 8px 0; font-size: 14px; color: var(--text-secondary); border-bottom: 1px solid var(--border); }
+  .price-card ul li::before { content: "✓ "; color: var(--primary); font-weight: 700; }
+  .price-card ul li.no::before { content: "— "; color: var(--text-muted); }
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="inner">
+    <a class="brand" href="/ui/"><span class="logo">C</span><span>CTR Insight</span></a>
+    <div class="nav-links">
+      <a href="/ui/">首页</a>
+      <a href="/ui/features.html">产品功能</a>
+      <a href="/ui/cases.html">客户案例</a>
+      <a href="/ui/blog.html">博客</a>
+      <a href="/ui/pricing.html" class="active">定价</a>
+      <a href="/ui/docs.html">文档</a>
+      <a href="/ui/about.html">关于</a>
+      <a href="/ui/app.html" class="nav-cta btn btn-primary btn-sm">进入工作台 →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container" style="padding-top:64px; padding-bottom:64px;">
+  <h1 class="section-title" style="font-size:40px;">简单透明的定价</h1>
+  <p class="section-sub">从个人分析到团队协作，选择适合你的方案。</p>
+
+  <div class="price-grid">
+    <div class="price-card">
+      <h3>免费版</h3>
+      <div class="price">¥0<span class="unit">/月</span></div>
+      <div class="period">个人学习与试用</div>
+      <ul>
+        <li>模拟数据演示</li>
+        <li>数据导入与预测</li>
+        <li>基础动态分析</li>
+        <li class="no">真实数据训练</li>
+        <li class="no">团队协作</li>
+      </ul>
+      <a href="/ui/app.html" class="btn secondary" style="display:block;">开始使用</a>
+    </div>
+
+    <div class="price-card featured">
+      <div class="flag">最受欢迎</div>
+      <h3>专业版</h3>
+      <div class="price">¥299<span class="unit">/月</span></div>
+      <div class="period">数据分析师与个人开发者</div>
+      <ul>
+        <li>真实数据导入与训练</li>
+        <li>完整动态分析能力</li>
+        <li>数据集管理 + 任务历史</li>
+        <li>CTR + CVR 双任务建模</li>
+        <li class="no">团队协作</li>
+      </ul>
+      <a href="/ui/app.html" class="btn" style="display:block;">免费试用</a>
+    </div>
+
+    <div class="price-card">
+      <h3>企业版</h3>
+      <div class="price">定制<span class="unit"></span></div>
+      <div class="period">团队与组织</div>
+      <ul>
+        <li>专业版全部功能</li>
+        <li>团队协作与数据隔离</li>
+        <li>自定义模型与部署</li>
+        <li>专属技术支持</li>
+        <li>私有化部署</li>
+      </ul>
+      <a href="/ui/about.html" class="btn secondary" style="display:block;">联系我们</a>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="inner">
+    <div class="col"><a class="brand" href="/ui/"><span class="logo">C</span><span>CTR Insight</span></a></div>
+    <div class="col"><h4>产品</h4><a href="/ui/features.html">产品功能</a><a href="/ui/pricing.html">定价</a><a href="/ui/app.html">工作台</a></div>
+    <div class="col"><h4>资源</h4><a href="/ui/cases.html">客户案例</a><a href="/ui/blog.html">博客</a><a href="/ui/docs.html">文档</a></div>
+  </div>
+  <div class="copyright">© 2026 CTR Insight</div>
+</footer>
+
+</body>
+</html>

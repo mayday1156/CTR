@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CTR Insight · 点击率智能分析平台</title>
+<link rel="stylesheet" href="/ui/assets/site.css">
+<style>
+  .hero { position: relative; overflow: hidden; padding: 96px 0 80px; }
+  .hero::before {
+    content: ""; position: absolute; inset: 0; z-index: -1;
+    background:
+      radial-gradient(600px 400px at 15% 20%, rgba(47,107,255,.10), transparent),
+      radial-gradient(500px 360px at 85% 30%, rgba(0,184,148,.10), transparent);
+  }
+  .hero h1 { font-size: 48px; font-weight: 800; letter-spacing: -.03em; line-height: 1.15; }
+  .hero h1 .grad {
+    background: linear-gradient(120deg, #2f6bff, #00b894);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero p.lead { font-size: 19px; color: var(--text-secondary); margin: 20px 0 32px; max-width: 600px; }
+  .hero .cta-row { display: flex; gap: 14px; flex-wrap: wrap; }
+  .hero .stats { display: flex; gap: 48px; margin-top: 56px; flex-wrap: wrap; }
+  .hero .stats .num { font-size: 30px; font-weight: 800; color: var(--text); }
+  .hero .stats .lab { font-size: 13px; color: var(--text-muted); }
+
+  .feature-card { padding: 28px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); transition: .2s; }
+  .feature-card:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); }
+  .feature-card .ico { width: 46px; height: 46px; border-radius: 12px; display: flex;
+    align-items: center; justify-content: center; font-size: 22px; margin-bottom: 16px; }
+  .feature-card h3 { font-size: 18px; margin-bottom: 8px; }
+  .feature-card p { font-size: 14px; color: var(--text-secondary); }
+
+  .cta-band { background: linear-gradient(120deg, #2f6bff, #00b894); border-radius: 20px;
+    padding: 56px; color: #fff; text-align: center; }
+  .cta-band h2 { font-size: 30px; margin-bottom: 12px; }
+  .cta-band p { opacity: .9; margin-bottom: 28px; }
+  .cta-band .btn { background: #fff; color: var(--primary); }
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="inner">
+    <a class="brand" href="/ui/">
+      <span class="logo">C</span><span>CTR Insight</span>
+    </a>
+    <div class="nav-links">
+      <a href="/ui/" class="active">首页</a>
+      <a href="/ui/features.html">产品功能</a>
+      <a href="/ui/cases.html">客户案例</a>
+      <a href="/ui/blog.html">博客</a>
+      <a href="/ui/pricing.html">定价</a>
+      <a href="/ui/docs.html">文档</a>
+      <a href="/ui/about.html">关于</a>
+      <a href="/ui/login.html" class="nav-login">登录</a>
+      <a href="/ui/app.html" class="nav-cta btn btn-primary btn-sm">进入工作台 →</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="container">
+    <span class="badge badge-blue">数据分析 SaaS 平台</span>
+    <h1 class="mt-16">把海量广告曝光日志<br>变成可行动的 <span class="grad">点击率洞察</span></h1>
+    <p class="lead">基于阿里 Ali-CCP 真实数据集，提供点击率（CTR）与转化率（CVR）的深度分析、动态可视化和深度学习预估，一站式完成「数据导入 → 分析 → 建模 → 预测」。</p>
+    <div class="cta-row">
+      <a href="/ui/app.html" class="btn btn-primary btn-lg">免费开始使用</a>
+      <a href="/ui/features.html" class="btn btn-outline btn-lg">了解功能</a>
+    </div>
+    <div class="stats">
+      <div><div class="num">4300万+</div><div class="lab">真实曝光日志样本</div></div>
+      <div><div class="num">20 维</div><div class="lab">结构化特征字段</div></div>
+      <div><div class="num">DeepFM</div><div class="lab">深度学习预估模型</div></div>
+      <div><div class="num">CTR + CVR</div><div class="lab">双任务预测</div></div>
+    </div>
+  </div>
+</header>
+
+<section class="section" style="padding-top: 24px;">
+  <div class="container">
+    <h2 class="section-title text-center">一个平台，覆盖全链路</h2>
+    <p class="section-sub text-center" style="margin: 0 auto 48px;">从原始行为日志到可落地的预估结果，无需切换工具。</p>
+    <div class="grid grid-3">
+      <div class="feature-card">
+        <div class="ico" style="background:#eef3ff;">📥</div>
+        <h3>数据导入与映射</h3>
+        <p>上传 parquet / csv 等格式，智能解析 feature_list 编码，网站引导字段映射，数据质量自动校验。</p>
+      </div>
+      <div class="feature-card">
+        <div class="ico" style="background:#e6f9f2;">📊</div>
+        <h3>动态数据分析</h3>
+        <p>多维交叉 CTR 热力图、转化漏斗、行为序列分布、字段覆盖率，交互式下钻探索。</p>
+      </div>
+      <div class="feature-card">
+        <div class="ico" style="background:#fef3e2;">🧠</div>
+        <h3>CTR / CVR 预估</h3>
+        <p>基于 DeepFM 深度学习模型，批量预估点击率与转化率，支持结果导出与评估。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background: var(--surface); border-top: 1px solid var(--border);">
+  <div class="container">
+    <div class="grid grid-2" style="align-items:center; gap:56px;">
+      <div>
+        <h2 class="section-title">为什么选择 CTR Insight</h2>
+        <p class="section-sub" style="max-width:none;">在 4300 万条真实曝光日志上验证的方法论，把工业级 CTR 预估能力装进一个易用的产品。</p>
+        <ul style="list-style:none; margin-top:24px; display:grid; gap:16px;">
+          <li>✅ <b>真实数据契约</b>：严格对齐 Ali-CCP 数据结构，模拟数据可无缝替换真实数据</li>
+          <li>✅ <b>工业级特征工程</b>：三层分隔编码解析、频次过滤词表、多值行为序列建模</li>
+          <li>✅ <b>深度学习模型</b>：DeepFM（FM + DNN），field-aware embedding，AUC/GAUC 全评估</li>
+          <li>✅ <b>完整评估体系</b>：AUC、LogLoss、概率校准、GAUC 用户内排序能力拆解</li>
+        </ul>
+      </div>
+      <div class="card" style="padding:32px;">
+        <div style="font-size:14px;color:var(--text-secondary);margin-bottom:16px;">模型评估指标（官方时间隔离测试集）</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div style="background:var(--primary-soft);border-radius:10px;padding:16px;text-align:center;">
+            <div style="font-size:26px;font-weight:800;color:var(--primary);">0.5969</div>
+            <div style="font-size:12px;color:var(--text-muted);">全局 AUC</div>
+          </div>
+          <div style="background:var(--primary-soft);border-radius:10px;padding:16px;text-align:center;">
+            <div style="font-size:26px;font-weight:800;color:var(--accent);">0.5775</div>
+            <div style="font-size:12px;color:var(--text-muted);">GAUC</div>
+          </div>
+          <div style="background:var(--primary-soft);border-radius:10px;padding:16px;text-align:center;">
+            <div style="font-size:26px;font-weight:800;color:var(--text);">0.1628</div>
+            <div style="font-size:12px;color:var(--text-muted);">test LogLoss</div>
+          </div>
+          <div style="background:var(--primary-soft);border-radius:10px;padding:16px;text-align:center;">
+            <div style="font-size:26px;font-weight:800;color:var(--text);">37.7M</div>
+            <div style="font-size:12px;color:var(--text-muted);">模型参数</div>
+          </div>
+        </div>
+        <p class="muted mt-16" style="font-size:13px;">数据来源：阿里 Ali-CCP 公开数据集 · 时间隔离测试集 43,016,614 行</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="cta-band">
+      <h2>立即开始你的数据分析之旅</h2>
+      <p>无需注册，打开工作台即可体验完整的「导入 → 分析 → 预测」流程。</p>
+      <a href="/ui/app.html" class="btn btn-lg">进入工作台 →</a>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="inner">
+    <div class="col">
+      <a class="brand" href="/ui/"><span class="logo">C</span><span>CTR Insight</span></a>
+      <p class="muted" style="font-size:13px;max-width:240px;margin-top:12px;">点击率智能分析平台，让海量广告日志变成可行动的洞察。</p>
+    </div>
+    <div class="col">
+      <h4>产品</h4>
+      <a href="/ui/features.html">产品功能</a>
+      <a href="/ui/app.html">工作台</a>
+      <a href="/ui/docs.html">文档</a>
+    </div>
+    <div class="col">
+      <h4>资源</h4>
+      <a href="/ui/docs.html">使用指南</a>
+      <a href="/ui/about.html">关于我们</a>
+    </div>
+  </div>
+  <div class="copyright">© 2026 CTR Insight · 基于阿里 Ali-CCP 数据集的点击率分析平台</div>
+</footer>
+
+</body>
+</html>

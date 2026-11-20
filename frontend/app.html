@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>工作台 · CTR Insight</title>
+<script src="https://cdn.jsdelivr.net/npm/vue@3.4.21/dist/vue.global.prod.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<link rel="stylesheet" href="/ui/assets/site.css">
+<style>
+  body { background: var(--bg); }
+  .app-layout { display: flex; min-height: 100vh; }
+
+  /* 侧边栏 */
+  .sidebar {
+    width: 220px; flex-shrink: 0; background: #1a2233; color: #c8d0dc;
+    display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh;
+  }
+  .sidebar .brand { padding: 20px; color: #fff; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .sidebar .brand .logo { background: linear-gradient(135deg, #2f6bff, #00b894); }
+  .sidebar .menu { flex: 1; padding: 16px 12px; }
+  .sidebar .menu .group-label { font-size: 11px; text-transform: uppercase; letter-spacing: .08em;
+    color: #5b6472; padding: 12px 10px 6px; }
+  .sidebar .menu a {
+    display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px;
+    color: #c8d0dc; font-size: 14px; font-weight: 500; margin-bottom: 2px; transition: .15s;
+  }
+  .sidebar .menu a:hover { background: rgba(255,255,255,.06); color: #fff; }
+  .sidebar .menu a.active { background: var(--primary); color: #fff; }
+  .sidebar .menu a .ico { font-size: 16px; width: 20px; text-align: center; }
+  .sidebar .foot { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,.08); font-size: 12px; color: #5b6472; }
+
+  /* 主内容 */
+  .main { flex: 1; min-width: 0; padding: 28px 32px; }
+  .main-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .main-header h1 { font-size: 22px; font-weight: 700; }
+  .main-header .crumb { font-size: 13px; color: var(--text-muted); }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 24px; margin-bottom: 20px; box-shadow: var(--shadow-sm); }
+  .panel h2 { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .kpi { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 20px; box-shadow: var(--shadow-sm); }
+  .kpi .label { font-size: 13px; color: var(--text-muted); }
+  .kpi .value { font-size: 28px; font-weight: 800; margin-top: 6px; }
+  .kpi .sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+  @media (max-width: 900px) { .kpi-grid { grid-template-columns: 1fr 1fr; } }
+
+  .chart { width: 100%; height: 320px; }
+  .chart.tall { height: 420px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 800px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  select, .btn { padding: 8px 14px; border: 1px solid var(--border); border-radius: 8px;
+    font-size: 14px; background: #fff; cursor: pointer; }
+  .btn { background: var(--primary); color: #fff; border: none; font-weight: 600; }
+  .btn:hover { opacity: .9; }
+  .btn.secondary { background: #fff; color: var(--text); border: 1px solid var(--border); }
+
+  .dropzone { border: 2px dashed var(--border); border-radius: 10px; padding: 32px;
+    text-align: center; color: var(--text-muted); cursor: pointer; transition: .2s; }
+  .dropzone:hover { border-color: var(--primary); background: var(--primary-soft); }
+  .dropzone input { display: none; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+  th { background: #f9fafb; font-weight: 600; color: var(--text-muted); }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+  .tag.ok { background: #f0fdf4; color: var(--accent); }
+  .tag.warn { background: #fef3c7; color: var(--warn); }
+  .hint { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+  .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .mt { margin-top: 16px; }
+</style>
+</head>
+<body>
+<div id="app" class="app-layout">
+
+  <!-- 侧边栏 -->
+  <aside class="sidebar">
+    <a class="brand" href="/ui/"><span class="logo">C</span><span>CTR Insight</span></a>
+    <nav class="menu">
+      <div class="group-label">工作台</div>
+      <a :class="{active: tab==='overview'}" @click="switchTab('overview')"><span class="ico">🏠</span>概览</a>
+      <a :class="{active: tab==='analysis'}" @click="switchTab('analysis')"><span class="ico">📊</span>数据分析</a>
+      <a :class="{active: tab==='import'}" @click="switchTab('import')"><span class="ico">📥</span>数据导入与预测</a>
+      <a :class="{active: tab==='models'}" @click="switchTab('models')"><span class="ico">📈</span>模型对比</a>
+      <div class="group-label">我的数据</div>
+      <a :class="{active: tab==='datasets'}" @click="switchTab('datasets')"><span class="ico">🗂️</span>数据集管理</a>
+      <a :class="{active: tab==='tasks'}" @click="switchTab('tasks')"><span class="ico">📋</span>任务历史</a>
+      <div class="group-label">账号</div>
+      <a :class="{active: tab==='profile'}" @click="switchTab('profile')"><span class="ico">👤</span>用户中心</a>
+      <div class="group-label">返回</div>
+      <a href="/ui/"><span class="ico">←</span>回到官网</a>
+    </nav>
+    <div class="foot">
+      <template v-if="user">
+        <div style="color:#c8d0dc; font-weight:600;">👤 {{ user.username }}</div>
+        <a href="#" @click.prevent="logout" style="color:#5b6472; font-size:12px;">退出登录</a>
+      </template>
+      <template v-else>
+        <a href="/ui/login.html" style="color:#9aa4b2; font-size:12px;">登录 / 注册</a>
+      </template>
+    </div>
+  </aside>
+
+  <!-- 主内容 -->
+  <main class="main">
+    <div class="main-header">
+      <div>
+        <h1>{{ tabTitle }}</h1>
+        <div class="crumb">工作台 / {{ tabTitle }}</div>
+      </div>
+      <a href="/ui/docs.html" class="btn secondary">使用文档</a>
+    </div>
+
+    <!-- ============ 概览 ============ -->
+    <div v-show="tab==='overview'">
+      <div class="kpi-grid">
+        <div class="kpi"><div class="label">曝光样本数</div><div class="value">{{ overview.n_samples?.toLocaleString() }}</div><div class="sub">训练集</div></div>
+        <div class="kpi"><div class="label">全局 CTR</div><div class="value">{{ fmtPct(overview.ctr) }}</div><div class="sub">点击率</div></div>
+        <div class="kpi"><div class="label">全局 CVR</div><div class="value">{{ fmtPct(overview.cvr) }}</div><div class="sub">转化率</div></div>
+        <div class="kpi"><div class="label">特征字段</div><div class="value">20</div><div class="sub">14 单值 + 6 多值</div></div>
+      </div>
+
+      <div class="panel mt">
+        <h2>数据表概览</h2>
+        <table>
+          <thead><tr><th>数据表</th><th>行数</th><th>列</th></tr></thead>
+          <tbody>
+            <tr v-for="(v, k) in overview.tables" :key="k">
+              <td>{{ k }}</td>
+              <td>{{ v.n_rows?.toLocaleString() }}</td>
+              <td class="muted">{{ v.columns?.join(', ') }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <h2>转化漏斗</h2>
+          <div class="chart" ref="ovFunnel"></div>
+        </div>
+        <div class="panel">
+          <h2>模型就绪状态</h2>
+          <table>
+            <tbody>
+              <tr><td>CTR 模型（DeepFM）</td><td><span :class="['tag', modelArtifacts.ctr_ckpt ? 'ok' : 'warn']">{{ modelArtifacts.ctr_ckpt ? '✓ 已就绪' : '未训练' }}</span></td></tr>
+              <tr><td>CVR 模型（DeepFM）</td><td><span :class="['tag', modelArtifacts.cvr_ckpt ? 'ok' : 'warn']">{{ modelArtifacts.cvr_ckpt ? '✓ 已就绪' : '未训练' }}</span></td></tr>
+              <tr><td>词表</td><td><span :class="['tag', modelArtifacts.vocab ? 'ok' : 'warn']">{{ modelArtifacts.vocab ? '✓ 已就绪' : '未构建' }}</span></td></tr>
+            </tbody>
+          </table>
+          <div class="hint">模型未就绪时，请先运行训练脚本（见使用文档）。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 数据分析 ============ -->
+    <div v-show="tab==='analysis'">
+      <div class="grid-2">
+        <div class="panel">
+          <h2>转化漏斗</h2>
+          <div class="chart" ref="funnelChart"></div>
+        </div>
+        <div class="panel">
+          <h2>维度交叉 CTR 热力图</h2>
+          <div class="row" style="margin-bottom:8px;">
+            <select v-model="cross.x" @change="loadCross"><option v-for="d in dims.categorical" :key="d.field" :value="d.field">{{ d.label }}</option></select>
+            <span>×</span>
+            <select v-model="cross.y" @change="loadCross"><option v-for="d in dims.categorical" :key="d.field" :value="d.field">{{ d.label }}</option></select>
+          </div>
+          <div class="chart tall" ref="heatChart"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>单字段 CTR 分布</h2>
+        <div class="row" style="margin-bottom:8px;">
+          <select v-model="ctrField" @change="loadCtrByField">
+            <option v-for="d in [...dims.categorical, ...dims.single]" :key="d.field" :value="d.field">{{ d.label }}</option>
+          </select>
+        </div>
+        <div class="chart" ref="ctrBarChart"></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <h2>行为序列长度分布</h2>
+          <select v-model="seqField" @change="loadSeqDist" style="margin-bottom:8px;">
+            <option v-for="d in dims.multi" :key="d.field" :value="d.field">{{ d.label }}</option>
+          </select>
+          <div class="chart" ref="seqChart"></div>
+        </div>
+        <div class="panel">
+          <h2>字段覆盖 / unknown 率</h2>
+          <div class="chart" ref="coverageChart" style="height:420px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 数据导入与预测 ============ -->
+    <div v-show="tab==='import'">
+      <div class="panel">
+        <h2>上传数据文件</h2>
+        <div class="dropzone" @click="$refs.fileInput.click()"
+             @dragover.prevent="dragover=true" @dragleave="dragover=false" @drop.prevent="onDrop" :class="{dragover}">
+          <div style="font-size:32px;">📁</div>
+          <div>点击选择文件，或拖拽到此处</div>
+          <div class="hint">支持 .parquet / .csv / .xlsx / .json</div>
+          <input type="file" ref="fileInput" @change="onFileChange" accept=".parquet,.csv,.xlsx,.xls,.json,.txt">
+        </div>
+        <div v-if="uploadResult" class="mt"><span class="tag ok">✓ {{ uploadResult.filename }}（{{ uploadResult.n_rows }} 行）</span></div>
+      </div>
+
+      <div class="panel" v-if="uploadResult">
+        <h2>字段映射（引导）</h2>
+        <table>
+          <thead><tr><th>标准字段</th><th>含义</th><th>映射到文件列</th></tr></thead>
+          <tbody>
+            <tr v-for="std in standardFields" :key="std">
+              <td><b>{{ std }}</b></td>
+              <td class="muted">{{ fieldDesc(std) }}</td>
+              <td>
+                <select v-model="mapping[std]">
+                  <option value="">（不映射）</option>
+                  <option v-for="c in uploadResult.columns" :key="c" :value="c">{{ c }}</option>
+                </select>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="row mt">
+          <button class="btn" @click="doPredict">开始预测（CTR + CVR）</button>
+          <span v-if="!modelArtifacts.ctr_ckpt" class="tag warn">模型未就绪，请先训练</span>
+        </div>
+      </div>
+
+      <div class="panel" v-if="summary">
+        <h2>预测结果</h2>
+        <div class="kpi-grid">
+          <div class="kpi"><div class="label">样本数</div><div class="value">{{ summary.n_rows }}</div></div>
+          <div class="kpi"><div class="label">平均 pCTR</div><div class="value">{{ fmt(summary.pctr_mean) }}</div></div>
+          <div class="kpi"><div class="label">平均 pCVR</div><div class="value">{{ fmt(summary.pcvr_mean) }}</div></div>
+          <div class="kpi"><div class="label">CTR AUC</div><div class="value">{{ fmt(summary.ctr_auc) }}</div></div>
+        </div>
+        <div class="chart mt" ref="pctrChart"></div>
+        <div class="row mt">
+          <button class="btn secondary" @click="doExport">导出结果 CSV</button>
+        </div>
+      </div>
+
+      <div class="panel" v-if="resultHead.length">
+        <h2>预测明细（前 50 条）</h2>
+        <table>
+          <thead><tr><th>#</th><th>pCTR</th><th>pCVR</th><th>pCTCVR</th></tr></thead>
+          <tbody>
+            <tr v-for="r in resultHead" :key="r.index"><td>{{ r.index }}</td><td>{{ fmt(r.pctr) }}</td><td>{{ fmt(r.pcvr) }}</td><td>{{ fmt(r.pctcvr) }}</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ 模型对比 ============ -->
+    <div v-show="tab==='models'">
+      <div class="panel">
+        <h2>模型评估指标</h2>
+        <table>
+          <thead><tr><th>指标</th><th>CTR</th><th>CVR</th><th>CTCVR</th></tr></thead>
+          <tbody>
+            <tr><td>AUC</td><td>{{ fmt(metrics.metrics?.ctr?.auc) }}</td><td>{{ fmt(metrics.metrics?.cvr?.auc) }}</td><td>{{ fmt(metrics.metrics?.ctcvr?.auc) }}</td></tr>
+            <tr><td>先验（prior）</td><td>{{ fmt(metrics.metrics?.ctr?.prior) }}</td><td>—</td><td>—</td></tr>
+          </tbody>
+        </table>
+        <div class="hint">训练样本 {{ metrics.metrics?.n_samples }}，点击 {{ metrics.metrics?.n_click }} 次。</div>
+      </div>
+
+      <div class="panel">
+        <h2>模型架构说明</h2>
+        <p class="muted" style="font-size:14px;">
+          DeepFM = FM 一阶（线性） + FM 二阶（特征交叉） + DNN（深度）。每个字段用 field-aware embedding（16 维），
+          多值行为序列按权重加权池化。CTR 模型以 click 为标签，CVR 模型以 conversion 为标签（点击样本上训练）。
+        </p>
+        <div class="hint">完整的技术细节与训练日志见后端 <code>backend/train_models.py</code>。</div>
+      </div>
+    </div>
+
+    <!-- ============ 数据集管理 ============ -->
+    <div v-show="tab==='datasets'">
+      <div class="src-banner-note" v-if="!user" style="background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:12px 16px;border-radius:10px;margin-bottom:16px;">
+        你尚未登录，数据集管理仅对登录用户开放。<a href="/ui/login.html" style="font-weight:600;">去登录 →</a>
+      </div>
+      <div class="panel">
+        <h2>我的数据集</h2>
+        <table v-if="datasets.length">
+          <thead><tr><th>文件名</th><th>格式</th><th>行数</th><th>列数</th><th>上传时间</th><th>操作</th></tr></thead>
+          <tbody>
+            <tr v-for="d in datasets" :key="d.file_id">
+              <td>{{ d.filename }}</td>
+              <td>{{ d.ext || '—' }}</td>
+              <td>{{ d.n_rows?.toLocaleString() }}</td>
+              <td>{{ (d.columns || []).length }}</td>
+              <td>{{ d.created_at }}</td>
+              <td><a href="#" @click.prevent="removeDataset(d)" style="color:#ef4444;font-size:13px;">删除</a></td>
+            </tr>
+          </tbody>
+        </table>
+        <div v-else class="hint" style="padding:20px 0;">暂无数据集，去「数据导入与预测」上传一个吧。</div>
+      </div>
+    </div>
+
+    <!-- ============ 任务历史 ============ -->
+    <div v-show="tab==='tasks'">
+      <div class="src-banner-note" v-if="!user" style="background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:12px 16px;border-radius:10px;margin-bottom:16px;">
+        你尚未登录，任务历史仅对登录用户开放。<a href="/ui/login.html" style="font-weight:600;">去登录 →</a>
+      </div>
+      <div class="panel">
+        <h2>预测任务历史</h2>
+        <table v-if="tasks.length">
+          <thead><tr><th>任务 ID</th><th>数据文件</th><th>样本数</th><th>平均 pCTR</th><th>时间</th><th>操作</th></tr></thead>
+          <tbody>
+            <tr v-for="t in tasks" :key="t.task_id">
+              <td><code>{{ t.task_id }}</code></td>
+              <td>{{ t.filename }}</td>
+              <td>{{ t.n_rows?.toLocaleString() }}</td>
+              <td>{{ fmt(t.summary?.pctr_mean) }}</td>
+              <td>{{ t.created_at }}</td>
+              <td>
+                <a href="#" @click.prevent="viewTask(t)" style="color:var(--primary);font-size:13px;">详情</a>
+                <a href="#" @click.prevent="removeTask(t)" style="color:#ef4444;font-size:13px;margin-left:10px;">删除</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div v-else class="hint" style="padding:20px 0;">暂无预测任务。</div>
+      </div>
+
+      <div class="panel" v-if="taskDetail">
+        <h2>任务详情：{{ taskDetail.task_id }}</h2>
+        <table>
+          <thead><tr><th>#</th><th>pCTR</th><th>pCVR</th><th>pCTCVR</th></tr></thead>
+          <tbody>
+            <tr v-for="r in taskDetail.head" :key="r.index"><td>{{ r.index }}</td><td>{{ fmt(r.pctr) }}</td><td>{{ fmt(r.pcvr) }}</td><td>{{ fmt(r.pctcvr) }}</td></tr>
+          </tbody>
+        </table>
+        <div class="hint">共 {{ taskDetail.total }} 行，仅展示前 100 条。</div>
+      </div>
+    </div>
+
+    <!-- ============ 用户中心 ============ -->
+    <div v-show="tab==='profile'">
+      <div v-if="!user" class="panel" style="text-align:center;padding:48px;">
+        <div style="font-size:40px;margin-bottom:12px;">🔒</div>
+        <p style="color:var(--text-secondary);margin-bottom:20px;">请先登录以查看用户中心</p>
+        <a href="/ui/login.html" class="btn">登录 / 注册</a>
+      </div>
+      <div v-else>
+        <div class="panel">
+          <h2>个人信息</h2>
+          <table>
+            <tbody>
+              <tr><td><b>用户名</b></td><td>{{ user.username }}</td></tr>
+              <tr><td><b>邮箱</b></td><td>{{ user.email || '未填写' }}</td></tr>
+              <tr><td><b>注册时间</b></td><td>{{ user.created_at }}</td></tr>
+              <tr><td><b>数据集数量</b></td><td>{{ datasets.length }}</td></tr>
+              <tr><td><b>预测任务数量</b></td><td>{{ tasks.length }}</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <button class="btn secondary" @click="logout">退出登录</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const { createApp } = Vue;
+const API = window.location.origin || "http://127.0.0.1:8000";
+
+createApp({
+  data() {
+    return {
+      tab: "overview",
+      dataDir: "",
+      token: localStorage.getItem("ctr_token") || "",
+      user: null,
+      // overview
+      overview: { tables: {} },
+      modelArtifacts: { ctr_ckpt: false, cvr_ckpt: false, vocab: false },
+      metrics: { metrics: {} },
+      // analysis
+      dims: { categorical: [], single: [], multi: [] },
+      funnel: { steps: [] },
+      cross: { x: "206", y: "216" },
+      crossData: null,
+      ctrField: "206",
+      seqField: "109_14",
+      // import
+      dragover: false, uploadResult: null, mapping: {}, standardFields: [],
+      summary: null, resultHead: [], taskId: null,
+      // 数据管理 / 任务历史
+      datasets: [], tasks: [], taskDetail: null,
+    };
+  },
+  computed: {
+    tabTitle() {
+      return { overview: "概览", analysis: "数据分析", import: "数据导入与预测",
+               models: "模型对比", datasets: "数据集管理", tasks: "任务历史", profile: "用户中心" }[this.tab];
+    },
+  },
+  async mounted() {
+    await this.loadUser();
+    await this.loadOverview();
+    await this.loadModels();
+    await this.loadSchema();
+    await this.loadDims();
+  },
+  methods: {
+    authHeaders() {
+      return this.token ? { "Authorization": "Bearer " + this.token } : {};
+    },
+    async loadUser() {
+      if (!this.token) return;
+      try {
+        const r = await fetch(`${API}/api/auth/me`, { headers: this.authHeaders() });
+        if (r.ok) { const d = await r.json(); this.user = d.user; }
+        else { this.token = ""; localStorage.removeItem("ctr_token"); }
+      } catch (e) { /* 忽略 */ }
+    },
+    async loadDatasets() {
+      if (!this.token) return;
+      const r = await fetch(`${API}/api/data/datasets`, { headers: this.authHeaders() });
+      if (r.ok) { const d = await r.json(); this.datasets = d.datasets || []; }
+    },
+    async loadTasks() {
+      if (!this.token) return;
+      const r = await fetch(`${API}/api/data/tasks`, { headers: this.authHeaders() });
+      if (r.ok) { const d = await r.json(); this.tasks = d.tasks || []; }
+    },
+    async removeDataset(d) {
+      if (!confirm(`确认删除数据集「${d.filename}」？`)) return;
+      await fetch(`${API}/api/data/datasets/${d.file_id}`, { method: "DELETE", headers: this.authHeaders() });
+      await this.loadDatasets();
+    },
+    async removeTask(t) {
+      if (!confirm(`确认删除任务「${t.task_id}」？`)) return;
+      await fetch(`${API}/api/data/tasks/${t.task_id}`, { method: "DELETE", headers: this.authHeaders() });
+      this.taskDetail = null;
+      await this.loadTasks();
+    },
+    async viewTask(t) {
+      const r = await fetch(`${API}/api/data/tasks/${t.task_id}`, { headers: this.authHeaders() });
+      if (r.ok) { const d = await r.json(); this.taskDetail = { task_id: t.task_id, head: d.head || [], total: d.head?.length || 0 }; }
+    },
+    logout() {
+      if (this.token) fetch(`${API}/api/auth/logout`, { method: "POST", headers: this.authHeaders() });
+      localStorage.removeItem("ctr_token");
+      localStorage.removeItem("ctr_user");
+      this.token = ""; this.user = null; this.datasets = []; this.tasks = [];
+    },
+    async switchTab(t) {
+      this.tab = t;
+      await this.$nextTick();
+      if (t === "analysis") { await this.loadAnalysis(); }
+      if (t === "overview") { this.renderOvFunnel(); }
+      if (t === "datasets") { await this.loadDatasets(); }
+      if (t === "tasks") { await this.loadTasks(); }
+      if (t === "profile") { await this.loadDatasets(); await this.loadTasks(); }
+    },
+
+    // ---- 概览 ----
+    async loadOverview() {
+      const r = await fetch(`${API}/api/overview`).then(r => r.json());
+      this.overview = { tables: r.tables || {}, ...(r.summary || {}) };
+      this.dataDir = r.data_dir?.split(/[\\/]/).pop() || "";
+      const f = await fetch(`${API}/api/analysis/funnel`).then(r => r.json());
+      this.funnel = f;
+    },
+    async loadModels() {
+      const r = await fetch(`${API}/api/models`).then(r => r.json());
+      this.modelArtifacts = r.artifacts || {};
+      this.metrics = r;
+    },
+    renderOvFunnel() {
+      const c = echarts.init(this.$refs.ovFunnel);
+      const steps = this.funnel.steps || [];
+      c.setOption({
+        tooltip: { trigger: "item", formatter: "{b}: {c}" },
+        series: [{ type: "funnel", left: "10%", width: "80%", top: 20, bottom: 20,
+          max: steps[0]?.value || 100, label: { formatter: "{b} {c}" },
+          data: steps.map(s => ({ name: s.name, value: s.value })) }],
+      });
+    },
+
+    // ---- 分析 ----
+    async loadDims() {
+      this.dims = await fetch(`${API}/api/analysis/dims`).then(r => r.json());
+      if (this.dims.categorical.length) {
+        this.cross.x = this.dims.categorical[0].field;
+        this.cross.y = this.dims.categorical[1]?.field || this.dims.categorical[0].field;
+      }
+    },
+    async loadAnalysis() {
+      await this.loadCross();
+      await this.loadCtrByField();
+      await this.loadSeqDist();
+      await this.loadCoverage();
+      this.renderFunnel();
+    },
+    renderFunnel() {
+      const c = echarts.init(this.$refs.funnelChart);
+      c.setOption({
+        tooltip: { trigger: "item", formatter: "{b}: {c} ({d}%)" },
+        series: [{ type: "funnel", left: "10%", width: "80%", top: 20, bottom: 20,
+          max: this.funnel.steps[0]?.value || 100, label: { formatter: "{b} {c}" },
+          data: (this.funnel.steps || []).map(s => ({ name: s.name, value: s.value })) }],
+      });
+    },
+    async loadCross() {
+      const { x, y } = this.cross;
+      if (x === y) { this.crossData = null; return; }
+      this.crossData = await fetch(`${API}/api/analysis/cross?field_x=${x}&field_y=${y}&top_x=10&top_y=10`).then(r => r.json());
+      this.$nextTick(() => this.renderHeat());
+    },
+    renderHeat() {
+      if (!this.crossData?.matrix) return;
+      const c = echarts.init(this.$refs.heatChart);
+      const d = this.crossData; const data = [];
+      for (let i = 0; i < d.x_labels.length; i++) for (let j = 0; j < d.y_labels.length; j++) {
+        const v = d.matrix[i][j]; if (v !== null && !isNaN(v)) data.push([j, i, +(v * 100).toFixed(2)]);
+      }
+      c.setOption({
+        tooltip: { position: "top", formatter: p => `CTR: ${p.value[2]}%` },
+        grid: { left: 60, right: 20, top: 30, bottom: 60 },
+        xAxis: { type: "category", data: d.y_labels, splitArea: { show: true } },
+        yAxis: { type: "category", data: d.x_labels, splitArea: { show: true } },
+        visualMap: { min: 0, max: Math.max(...data.map(x => x[2]), 1), orient: "horizontal",
+          left: "center", bottom: 0, inRange: { color: ["#eff6ff", "#2563eb"] } },
+        series: [{ type: "heatmap", data, label: { show: true, formatter: p => p.value[2] + "%", fontSize: 9 } }],
+      });
+    },
+    async loadCtrByField() {
+      const d = await fetch(`${API}/api/analysis/ctr_by_field?field=${this.ctrField}&top=20`).then(r => r.json());
+      this.$nextTick(() => this.renderCtrBar(d));
+    },
+    renderCtrBar(d) {
+      const c = echarts.init(this.$refs.ctrBarChart);
+      const items = d.items || [];
+      c.setOption({
+        tooltip: { trigger: "axis", formatter: p => {
+          const it = items[p[0].dataIndex]; return `取值 ${it.value}<br>样本数 ${it.n}<br>CTR ${(it.ctr*100).toFixed(2)}%`;
+        }},
+        grid: { left: 50, right: 20, top: 30, bottom: 50 },
+        xAxis: { type: "category", data: items.map(i => String(i.value)), axisLabel: { rotate: 45 } },
+        yAxis: { type: "value", name: "CTR", axisLabel: { formatter: v => (v*100).toFixed(0) + "%" } },
+        series: [{ type: "bar", data: items.map(i => +(i.ctr*100).toFixed(2)), itemStyle: { color: "#2563eb" }, barMaxWidth: 30 }],
+      });
+    },
+    async loadSeqDist() {
+      const d = await fetch(`${API}/api/analysis/seq_dist?field=${this.seqField}`).then(r => r.json());
+      this.$nextTick(() => this.renderSeq(d));
+    },
+    renderSeq(d) {
+      const c = echarts.init(this.$refs.seqChart);
+      const items = d.items || [];
+      c.setOption({
+        tooltip: { trigger: "axis" },
+        grid: { left: 50, right: 20, top: 30, bottom: 40 },
+        xAxis: { type: "category", data: items.map(i => String(i.length)), name: "序列长度" },
+        yAxis: { type: "value", name: "样本数" },
+        series: [{ type: "bar", data: items.map(i => i.count), itemStyle: { color: "#16a34a" }, barMaxWidth: 30 }],
+      });
+    },
+    async loadCoverage() {
+      const d = await fetch(`${API}/api/analysis/coverage`).then(r => r.json());
+      this.$nextTick(() => this.renderCoverage(d));
+    },
+    renderCoverage(d) {
+      const c = echarts.init(this.$refs.coverageChart);
+      const single = d.single || [];
+      c.setOption({
+        tooltip: { trigger: "axis" },
+        legend: { data: ["覆盖率", "unknown 率"], top: 0 },
+        grid: { left: 90, right: 20, top: 30, bottom: 30 },
+        xAxis: { type: "value", max: 100, axisLabel: { formatter: "{value}%" } },
+        yAxis: { type: "category", data: single.map(i => i.label || i.field) },
+        series: [
+          { name: "覆盖率", type: "bar", data: single.map(i => +(i.coverage*100).toFixed(2)), itemStyle: { color: "#2563eb" } },
+          { name: "unknown 率", type: "bar", data: single.map(i => +(i.unknown_rate*100).toFixed(2)), itemStyle: { color: "#ef4444" } },
+        ],
+      });
+    },
+
+    // ---- 导入 ----
+    async loadSchema() {
+      const r = await fetch(`${API}/api/import/schema`).then(r => r.json());
+      const single = (r.single || []).map(f => `f${f}_id`);
+      const multi = (r.multi || []).flatMap(f => [`f${f}_ids`, `f${f}_w`]);
+      this.standardFields = ["feature_list", "click", "conversion", ...single, ...multi];
+    },
+    fieldDesc(std) {
+      if (std === "feature_list") return "原始特征编码列";
+      if (std === "click") return "点击标签（可选）";
+      if (std === "conversion") return "转化标签（可选）";
+      if (std.endsWith("_id")) return "单值特征";
+      if (std.endsWith("_ids")) return "多值特征 id";
+      if (std.endsWith("_w")) return "多值特征权重";
+      return "";
+    },
+    onFileChange(e) { const f = e.target.files[0]; if (f) this.doUpload(f); },
+    onDrop(e) { const f = e.dataTransfer.files[0]; if (f) this.doUpload(f); },
+    async doUpload(file) {
+      const fd = new FormData(); fd.append("file", file);
+      const r = await fetch(`${API}/api/import/upload`, { method: "POST", body: fd, headers: this.authHeaders() }).then(r => r.json());
+      this.uploadResult = r;
+      this.mapping = {};
+      r.columns.forEach(c => { if (this.standardFields.includes(c)) this.mapping[c] = c; });
+      this.summary = null; this.resultHead = [];
+      if (this.token) this.loadDatasets();
+    },
+    async doPredict() {
+      const r = await fetch(`${API}/api/import/predict`, {
+        method: "POST", headers: { "Content-Type": "application/json", ...this.authHeaders() },
+        body: JSON.stringify({ file_id: this.uploadResult.file_id, mapping: this.mapping }),
+      }).then(r => r.json());
+      this.summary = r; this.taskId = r.task_id;
+      const res = await fetch(`${API}/api/import/result/${r.task_id}`).then(r => r.json());
+      this.resultHead = (res.head || []).slice(0, 50);
+      this.$nextTick(() => this.renderPctrChart(r));
+      if (this.token) this.loadTasks();
+    },
+    renderPctrChart(summary) {
+      const c = echarts.init(this.$refs.pctrChart);
+      const bins = summary.distribution?.pctr_bins || [];
+      c.setOption({
+        tooltip: { trigger: "axis" },
+        grid: { left: 50, right: 20, top: 30, bottom: 40 },
+        xAxis: { type: "category", data: bins.map(b => b.bin.split("-")[0]), name: "pCTR 区间" },
+        yAxis: { type: "value", name: "样本数" },
+        series: [{ type: "bar", data: bins.map(b => b.count), itemStyle: { color: "#2563eb" }, barMaxWidth: 40 }],
+      });
+    },
+    doExport() { if (this.taskId) window.open(`${API}/api/import/export/${this.taskId}`, "_blank"); },
+
+    fmt(v) {
+      if (v === null || v === undefined) return "—";
+      if (typeof v === "number") { if (v < 0.001 && v > 0) return v.toExponential(3); return v.toFixed(4); }
+      return v;
+    },
+    fmtPct(v) { if (v === null || v === undefined) return "—"; return (v * 100).toFixed(2) + "%"; },
+  },
+}).mount("#app");
+</script>
+</body>
+</html>

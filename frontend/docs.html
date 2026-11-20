@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>使用文档 · CTR Insight</title>
+<link rel="stylesheet" href="/ui/assets/site.css">
+<style>
+  .doc-body { max-width: 800px; margin: 0 auto; }
+  .doc-body h2 { font-size: 22px; margin: 32px 0 12px; }
+  .doc-body h3 { font-size: 17px; margin: 24px 0 8px; }
+  .doc-body p, .doc-body li { color: var(--text-secondary); margin-bottom: 8px; }
+  .doc-body ul, .doc-body ol { padding-left: 22px; margin-bottom: 16px; }
+  .doc-body code {
+    background: #f1f3f6; padding: 2px 6px; border-radius: 4px;
+    font-family: "SF Mono", Consolas, monospace; font-size: 13px; color: #d6336c;
+  }
+  .doc-body pre {
+    background: #1a2233; color: #e6e8eb; padding: 16px; border-radius: 10px;
+    overflow-x: auto; font-size: 13px; margin: 12px 0; line-height: 1.6;
+  }
+  .doc-body pre code { background: none; color: #a8d0ff; }
+  .toc { background: var(--primary-soft); border-radius: 10px; padding: 20px; margin-bottom: 24px; }
+  .toc a { display: block; color: var(--text-secondary); padding: 4px 0; font-size: 14px; }
+  .toc a:hover { color: var(--primary); }
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="inner">
+    <a class="brand" href="/ui/"><span class="logo">C</span><span>CTR Insight</span></a>
+    <div class="nav-links">
+      <a href="/ui/">首页</a>
+      <a href="/ui/features.html">产品功能</a>
+      <a href="/ui/cases.html">客户案例</a>
+      <a href="/ui/blog.html">博客</a>
+      <a href="/ui/pricing.html">定价</a>
+      <a href="/ui/docs.html" class="active">文档</a>
+      <a href="/ui/about.html">关于</a>
+      <a href="/ui/login.html" class="nav-login">登录</a>
+      <a href="/ui/app.html" class="nav-cta btn btn-primary btn-sm">进入工作台 →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container doc-body" style="padding-top:48px;">
+  <h1 class="section-title" style="font-size:36px;">使用文档</h1>
+  <p class="section-sub">快速上手 CTR Insight，从环境搭建到完成一次完整的分析预测。</p>
+
+  <div class="toc mt-24">
+    <b style="font-size:14px;">目录</b>
+    <a href="#quickstart">1. 快速开始</a>
+    <a href="#data">2. 数据准备</a>
+    <a href="#real-data">3. 导入真实数据并训练（一键）</a>
+    <a href="#import">4. 数据导入与预测</a>
+    <a href="#analysis">5. 动态数据分析</a>
+    <a href="#model">6. 模型说明</a>
+  </div>
+
+  <h2 id="quickstart">1. 快速开始</h2>
+  <p>本项目使用虚拟环境隔离依赖。首次使用请先初始化环境：</p>
+  <pre><code># Git Bash / MSYS2 终端
+bash setup.sh
+
+# 启动后端
+bash start.sh</code></pre>
+  <p>启动后访问 <code>http://127.0.0.1:8000/ui/</code> 打开网站。</p>
+
+  <h2 id="data">2. 数据准备</h2>
+  <p>项目<strong>默认展示模拟数据</strong>（与真实 Ali-CCP 数据同结构），用于先把网站跑通。
+    生成模拟数据：</p>
+  <pre><code>./venv/Scripts/python.exe scripts/generate_mock_data.py \
+  --n-users 20000 --n-samples 200000 --seed 42</code></pre>
+
+  <h2 id="real-data">3. 导入真实数据并训练（一键脚本）</h2>
+  <p>当你拿到真实 Ali-CCP 数据后，只需两步即可让网站切换到真实数据 + 真实模型：</p>
+  <ol>
+    <li><b>放置数据</b>：把 4 个 parquet 文件放进 <code>data/real/</code> 目录：
+      <ul>
+        <li><code>common_features_train.parquet</code></li>
+        <li><code>common_features_test.parquet</code></li>
+        <li><code>sample_skeleton_train.parquet</code></li>
+        <li><code>sample_skeleton_test.parquet</code></li>
+      </ul>
+    </li>
+    <li><b>运行一键脚本</b>（保持后端已启动 <code>bash start.sh</code>）：
+      <pre><code># Git Bash / MSYS2 终端
+bash train_real.sh
+
+# 或 Windows CMD（双击 train_real.bat）
+# 可加参数：bash train_real.sh --epochs 5</code></pre>
+    </li>
+  </ol>
+  <p>脚本会自动完成：<b>检测数据 → 训练 CTR + CVR 模型 → 切换数据源到 real → 热重载后端同步到网页</b>。
+     完成后刷新浏览器，网站即显示真实数据与真实模型（工作台侧边栏与概览页会有「真实数据」徽章）。</p>
+  <p>如需自定义训练参数：</p>
+  <pre><code>./venv/Scripts/python.exe backend/train_real.py --epochs 5 --min-count 10</code></pre>
+  <p>想切回模拟数据：运行 <code>./venv/Scripts/python.exe backend/train_models.py --data-dir data/mock --source mock</code>
+     然后调用 <code>POST /api/reload</code>（或直接重启后端）。</p>
+
+  <h2 id="import">4. 数据导入与预测</h2>
+  <ol>
+    <li>进入「工作台 → 数据导入」</li>
+    <li>上传数据文件（parquet / csv / xlsx）</li>
+    <li>网站自动解析并引导字段映射</li>
+    <li>点击「开始预测」，得到 pCTR / pCVR / pCTCVR</li>
+    <li>导出结果 CSV</li>
+  </ol>
+
+  <h2 id="analysis">5. 动态数据分析</h2>
+  <p>在工作台的「数据分析」页，可以：</p>
+  <ul>
+    <li>查看曝光 → 点击 → 转化的转化漏斗</li>
+    <li>选择两个类目维度做交叉 CTR 热力图</li>
+    <li>查看单字段 CTR 分布、行为序列长度分布</li>
+    <li>诊断字段覆盖率与 unknown 率</li>
+  </ul>
+
+  <h2 id="model">6. 模型说明</h2>
+  <p>CTR 与 CVR 预估基于 <b>DeepFM</b> 模型（FM 一阶 + FM 二阶 + DNN），
+    采用 field-aware embedding 建模 20 个结构化特征字段。</p>
+  <p>训练模型（默认数据源）：</p>
+  <pre><code>./venv/Scripts/python.exe backend/train_models.py --min-count 3 --epochs 2</code></pre>
+  <p>模型产物（词表、CTR/CVR 权重、评估指标）输出到 <code>model/artifacts/</code>。</p>
+</div>
+
+<footer class="site-footer">
+  <div class="inner">
+    <div class="col">
+      <a class="brand" href="/ui/"><span class="logo">C</span><span>CTR Insight</span></a>
+    </div>
+    <div class="col">
+      <h4>产品</h4>
+      <a href="/ui/features.html">产品功能</a>
+      <a href="/ui/app.html">工作台</a>
+      <a href="/ui/docs.html">文档</a>
+    </div>
+    <div class="col">
+      <h4>资源</h4>
+      <a href="/ui/docs.html">使用指南</a>
+      <a href="/ui/about.html">关于我们</a>
+    </div>
+  </div>
+  <div class="copyright">© 2026 CTR Insight</div>
+</footer>
+
+</body>
+</html>

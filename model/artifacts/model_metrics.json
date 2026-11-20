@@ -1,0 +1,18 @@
+{
+  "ctr": {
+    "auc": 0.789,
+    "prior": 0.03620000183582306
+  },
+  "cvr": {
+    "auc": null
+  },
+  "ctcvr": {
+    "auc": null
+  },
+  "n_samples": 10000,
+  "n_click": 362,
+  "min_count": 5,
+  "epochs": 3,
+  "source": "real",
+  "trained_at": "2026-11-20 17:56:49"
+}

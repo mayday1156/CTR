@@ -1,0 +1,34 @@
+# Ali-CTR Lab 一键部署（Docker Compose）
+# 用法：docker compose up -d
+# 之后访问 http://<服务器IP>:8000 即可打开网站。
+#
+# 说明：
+#  - data/ 和 model/ 用 bind mount 挂载，服务器上训练出的模型、导入的数据持久化在宿主机
+#  - 首次部署后，把真实数据放到 data/real/，执行 `docker compose exec app python backend/train_real.py` 训练
+#  - 想用域名 + HTTPS，见 deploy/nginx.conf 和 docs/deploy.md
+
+services:
+  app:
+    build: .
+    image: ali-ctr-lab:latest
+    container_name: ali-ctr-lab
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      # 注意：不要硬编码 ALI_CCP_DATA。
+      # 数据源由宿主机 data/active_source.json 决定（train_real.sh 会写入），
+      # 这样宿主机训练/切换后，容器重启即自动跟随，不会互相覆盖。
+      ALI_CCP_HOST: "0.0.0.0"
+      ALI_CCP_PORT: "8000"
+      # 多 worker 时模型内存占用较高，可调低
+      GUNICORN_WORKERS: "4"
+    volumes:
+      # 持久化：数据（上传/预测/数据库/真实数据）、模型产物、前端
+      - ./data:/app/data
+      - ./model:/app/model
+    # 可选：限制资源
+    # deploy:
+    #   resources:
+    #     limits:
+    #       memory: 4G

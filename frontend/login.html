@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>登录 · CTR Insight</title>
+<script src="https://cdn.jsdelivr.net/npm/vue@3.4.21/dist/vue.global.prod.js"></script>
+<link rel="stylesheet" href="/ui/assets/site.css">
+<style>
+  body { background: var(--bg); }
+  .auth-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+  .auth-card { width: 100%; max-width: 420px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 36px; box-shadow: var(--shadow-md); }
+  .auth-card .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; }
+  .auth-card .brand .logo { background: linear-gradient(135deg, #2f6bff, #00b894); }
+  .auth-card h1 { font-size: 22px; margin-bottom: 4px; }
+  .auth-card .sub { color: var(--text-secondary); font-size: 14px; margin-bottom: 24px; }
+
+  .tabs { display: flex; background: var(--bg); border-radius: 10px; padding: 4px; margin-bottom: 24px; }
+  .tabs a { flex: 1; text-align: center; padding: 8px; border-radius: 8px; font-size: 14px;
+    color: var(--text-secondary); font-weight: 500; }
+  .tabs a.active { background: #fff; color: var(--text); box-shadow: var(--shadow-sm); font-weight: 600; }
+
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+  .field input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px;
+    font-size: 14px; box-sizing: border-box; }
+  .field input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(47,107,255,.12); }
+  .btn-block { width: 100%; padding: 12px; font-size: 15px; }
+  .err { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; border-radius: 8px;
+    padding: 10px 12px; font-size: 13px; margin-bottom: 16px; }
+  .back { display: block; text-align: center; margin-top: 18px; font-size: 13px; color: var(--text-muted); }
+  .back:hover { color: var(--primary); }
+</style>
+</head>
+<body>
+<div id="app" class="auth-wrap">
+  <div class="auth-card">
+    <div class="brand"><span class="logo">C</span><span style="font-weight:700;">CTR Insight</span></div>
+    <h1>{{ mode === 'login' ? '欢迎回来' : '创建账号' }}</h1>
+    <p class="sub">{{ mode === 'login' ? '登录后进入工作台，管理你的数据集与预测任务' : '注册一个账号，开始你的数据分析之旅' }}</p>
+
+    <div class="tabs">
+      <a :class="{active: mode==='login'}" @click="mode='login'; err=''">登录</a>
+      <a :class="{active: mode==='register'}" @click="mode='register'; err=''">注册</a>
+    </div>
+
+    <div class="err" v-if="err">{{ err }}</div>
+
+    <div class="field" v-if="mode==='register'">
+      <label>邮箱（选填）</label>
+      <input type="email" v-model="email" placeholder="you@example.com">
+    </div>
+    <div class="field">
+      <label>用户名</label>
+      <input type="text" v-model="username" placeholder="请输入用户名" @keyup.enter="submit">
+    </div>
+    <div class="field">
+      <label>密码</label>
+      <input type="password" v-model="password" placeholder="请输入密码" @keyup.enter="submit">
+    </div>
+
+    <button class="btn btn-block" @click="submit" :disabled="loading">
+      {{ loading ? '请稍候…' : (mode === 'login' ? '登录' : '注册') }}
+    </button>
+
+    <a class="back" href="/ui/">← 返回首页</a>
+  </div>
+</div>
+
+<script>
+const { createApp } = Vue;
+const API = window.location.origin || "http://127.0.0.1:8000";
+
+createApp({
+  data() {
+    return { mode: "login", username: "", password: "", email: "", err: "", loading: false };
+  },
+  mounted() {
+    // 已登录则直接进工作台
+    if (localStorage.getItem("ctr_token")) {
+      window.location.href = "/ui/app.html";
+    }
+  },
+  methods: {
+    async submit() {
+      this.err = "";
+      if (!this.username || !this.password) { this.err = "请输入用户名和密码"; return; }
+      this.loading = true;
+      try {
+        const endpoint = this.mode === "login" ? "/api/auth/login" : "/api/auth/register";
+        const body = this.mode === "login"
+          ? { username: this.username, password: this.password }
+          : { username: this.username, password: this.password, email: this.email };
+        const res = await fetch(`${API}${endpoint}`, {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        if (!res.ok) { this.err = data.detail || "操作失败"; return; }
+        localStorage.setItem("ctr_token", data.token);
+        localStorage.setItem("ctr_user", JSON.stringify(data.user));
+        window.location.href = "/ui/app.html";
+      } catch (e) {
+        this.err = "网络错误，请确认后端已启动";
+      } finally {
+        this.loading = false;
+      }
+    },
+  },
+}).mount("#app");
+</script>
+</body>
+</html>

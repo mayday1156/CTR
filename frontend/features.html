@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>产品功能 · CTR Insight</title>
+<link rel="stylesheet" href="/ui/assets/site.css">
+<style>
+  .feat-block { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center;
+    padding: 48px 0; border-bottom: 1px solid var(--border); }
+  .feat-block:last-child { border-bottom: none; }
+  .feat-block .desc h2 { font-size: 26px; font-weight: 800; margin-bottom: 12px; }
+  .feat-block .desc p { color: var(--text-secondary); margin-bottom: 16px; }
+  .feat-block .desc ul { list-style: none; display: grid; gap: 10px; }
+  .feat-block .desc li::before { content: "▸ "; color: var(--primary); font-weight: 700; }
+  .feat-block .mock {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 28px; box-shadow: var(--shadow-md); min-height: 220px; display: flex;
+    align-items: center; justify-content: center;
+  }
+  @media (max-width: 800px) { .feat-block { grid-template-columns: 1fr; } }
+  .mock .big { font-size: 64px; }
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="inner">
+    <a class="brand" href="/ui/"><span class="logo">C</span><span>CTR Insight</span></a>
+    <div class="nav-links">
+      <a href="/ui/">首页</a>
+      <a href="/ui/features.html" class="active">产品功能</a>
+      <a href="/ui/cases.html">客户案例</a>
+      <a href="/ui/blog.html">博客</a>
+      <a href="/ui/pricing.html">定价</a>
+      <a href="/ui/docs.html">文档</a>
+      <a href="/ui/about.html">关于</a>
+      <a href="/ui/login.html" class="nav-login">登录</a>
+      <a href="/ui/app.html" class="nav-cta btn btn-primary btn-sm">进入工作台 →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container" style="padding-top:56px;">
+  <h1 class="section-title" style="font-size:40px;">产品功能</h1>
+  <p class="section-sub">CTR Insight 提供四大核心能力，覆盖从数据到洞察的完整闭环。</p>
+
+  <div class="feat-block">
+    <div class="desc">
+      <h2>数据导入与字段映射</h2>
+      <p>支持多种格式，智能解析阿里私有特征编码，网站引导完成字段映射与质量校验。</p>
+      <ul>
+        <li>支持 parquet / csv / xlsx / json 格式上传</li>
+        <li>自动解析 feature_list 三层分隔编码（20 个结构化字段）</li>
+        <li>字段映射引导 + 数据质量校验报告</li>
+        <li>模拟数据与真实数据无缝替换</li>
+      </ul>
+    </div>
+    <div class="mock"><div class="big">📥</div></div>
+  </div>
+
+  <div class="feat-block">
+    <div class="desc">
+      <h2>动态数据分析</h2>
+      <p>交互式探索海量曝光日志，从多个维度洞察点击率规律。</p>
+      <ul>
+        <li>转化漏斗：曝光 → 点击 → 转化逐层流失</li>
+        <li>维度交叉 CTR 热力图（类目、广告位、投放策略等）</li>
+        <li>单字段 CTR 分布、行为序列长度分布</li>
+        <li>字段覆盖率与 unknown 率诊断</li>
+      </ul>
+    </div>
+    <div class="mock"><div class="big">📊</div></div>
+  </div>
+
+  <div class="feat-block">
+    <div class="desc">
+      <h2>CTR / CVR 智能预估</h2>
+      <p>基于 DeepFM 深度学习模型，批量预估每条曝光的点击率与转化率。</p>
+      <ul>
+        <li>DeepFM 模型：field-aware embedding + FM 二阶 + DNN</li>
+        <li>CTR + CVR 双任务预测（pCTR / pCVR / pCTCVR）</li>
+        <li>批量预测 + 结果分布可视化</li>
+        <li>结果一键导出 CSV</li>
+      </ul>
+    </div>
+    <div class="mock"><div class="big">🧠</div></div>
+  </div>
+
+  <div class="feat-block">
+    <div class="desc">
+      <h2>模型评估与对比</h2>
+      <p>完整的评估体系，量化模型排序能力与概率校准质量。</p>
+      <ul>
+        <li>AUC / LogLoss / GAUC 多指标评估</li>
+        <li>概率校准曲线与校准系数</li>
+        <li>GAUC 拆解用户内排序能力</li>
+        <li>LR / GBDT / DeepFM 多模型对比</li>
+      </ul>
+    </div>
+    <div class="mock"><div class="big">📈</div></div>
+  </div>
+
+  <div class="cta-band" style="margin: 48px 0;">
+    <h2>准备好体验了吗？</h2>
+    <p>无需注册，立即进入工作台。</p>
+    <a href="/ui/app.html" class="btn btn-lg">进入工作台 →</a>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="inner">
+    <div class="col">
+      <a class="brand" href="/ui/"><span class="logo">C</span><span>CTR Insight</span></a>
+    </div>
+    <div class="col">
+      <h4>产品</h4>
+      <a href="/ui/features.html">产品功能</a>
+      <a href="/ui/app.html">工作台</a>
+      <a href="/ui/docs.html">文档</a>
+    </div>
+    <div class="col">
+      <h4>资源</h4>
+      <a href="/ui/docs.html">使用指南</a>
+      <a href="/ui/about.html">关于我们</a>
+    </div>
+  </div>
+  <div class="copyright">© 2026 CTR Insight</div>
+</footer>
+
+</body>
+</html>

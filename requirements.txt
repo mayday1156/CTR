@@ -1,0 +1,21 @@
+# Ali-CTR Lab 依赖
+# 运行环境：Python 3.10+（已在 3.13 验证）
+
+# 数据处理
+numpy>=1.24
+pandas>=2.0
+pyarrow>=14
+
+# 模型（CPU 版 torch 可单独装到 vendor/ 目录）
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
+torch>=2.0
+
+# 后端
+fastapi>=0.100
+uvicorn>=0.24
+gunicorn>=21.0      # 生产部署多进程（可选，Docker 部署时使用）
+python-multipart>=0.0.6
+openpyxl>=3.1   # 读取 xlsx
+
+# 注：本项目把 torch 安装到了 vendor/ 目录（避免系统 site-packages 冲突），
+# 脚本内部已自动注入 vendor 路径，直接运行即可。

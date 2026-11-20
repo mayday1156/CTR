@@ -1,0 +1,10 @@
+{
+  "n_common_train": 10000,
+  "n_common_test": 10000,
+  "n_skeleton_train": 100000,
+  "n_skeleton_test": 100000,
+  "ctr": 0.03853,
+  "cvr": 1e-05,
+  "seed": 42,
+  "note": "mock data, same schema as real Ali-CCP"
+}

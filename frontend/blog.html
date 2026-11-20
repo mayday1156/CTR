@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>博客 · CTR Insight</title>
+<link rel="stylesheet" href="/ui/assets/site.css">
+<style>
+  .post-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 28px; margin-bottom: 20px; transition: .2s; }
+  .post-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+  .post-card .meta { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+  .post-card h3 { font-size: 19px; margin-bottom: 10px; }
+  .post-card p { color: var(--text-secondary); font-size: 14px; line-height: 1.7; }
+  .post-card .read-more { color: var(--primary); font-weight: 600; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="inner">
+    <a class="brand" href="/ui/"><span class="logo">C</span><span>CTR Insight</span></a>
+    <div class="nav-links">
+      <a href="/ui/">首页</a>
+      <a href="/ui/features.html">产品功能</a>
+      <a href="/ui/cases.html">客户案例</a>
+      <a href="/ui/blog.html" class="active">博客</a>
+      <a href="/ui/pricing.html">定价</a>
+      <a href="/ui/docs.html">文档</a>
+      <a href="/ui/about.html">关于</a>
+      <a href="/ui/app.html" class="nav-cta btn btn-primary btn-sm">进入工作台 →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container" style="padding-top:64px; padding-bottom:64px;">
+  <h1 class="section-title" style="font-size:40px;">博客</h1>
+  <p class="section-sub">CTR 预估、数据科学实践与产品动态。</p>
+
+  <div class="post-card">
+    <div class="meta">2026-11-15 · 技术</div>
+    <h3>DeepFM 入门：从 FM 到深度特征交叉</h3>
+    <p>为什么 FM 能捕捉二阶特征交叉？DeepFM 如何把 FM 与 DNN 结合起来？本文用最直观的方式拆解 DeepFM 的结构，
+      并讲解 field-aware embedding 在 CTR 预估中的作用。</p>
+    <span class="read-more">阅读全文 →</span>
+  </div>
+
+  <div class="post-card">
+    <div class="meta">2026-11-08 · 实践</div>
+    <h3>CTR 与 CVR 联合建模：ESMM 思路详解</h3>
+    <p>点击与转化是两个强相关的任务，独立建模会带来样本选择偏差。ESMM 通过 CTCVR 的乘法关系实现多任务联合学习，
+      本文结合 Ali-CCP 数据集讲解其动机与实现要点。</p>
+    <span class="read-more">阅读全文 →</span>
+  </div>
+
+  <div class="post-card">
+    <div class="meta">2026-10-30 · 数据</div>
+    <h3>解析阿里 Ali-CCP 数据集：特征编码与标签分布</h3>
+    <p>Ali-CCP 是广告点击/转化预测的经典数据集。本文带你读懂它的 feature_list 三层分隔编码、
+      20 个特征字段的含义，以及点击率 3.89%、转化率 0.02% 的极端类别不平衡问题。</p>
+    <span class="read-more">阅读全文 →</span>
+  </div>
+
+  <div class="post-card">
+    <div class="meta">2026-10-20 · 产品</div>
+    <h3>把离线分析产品化：一个 CTR 分析 SaaS 的诞生</h3>
+    <p>从离线脚本到可交互的 Web 工作台，我们如何把数据导入、动态分析、模型预测整合成一个完整的 SaaS 产品，
+      以及背后 FastAPI + Vue3 + ECharts 的技术选型考量。</p>
+    <span class="read-more">阅读全文 →</span>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="inner">
+    <div class="col"><a class="brand" href="/ui/"><span class="logo">C</span><span>CTR Insight</span></a></div>
+    <div class="col"><h4>产品</h4><a href="/ui/features.html">产品功能</a><a href="/ui/pricing.html">定价</a><a href="/ui/app.html">工作台</a></div>
+    <div class="col"><h4>资源</h4><a href="/ui/cases.html">客户案例</a><a href="/ui/blog.html">博客</a><a href="/ui/docs.html">文档</a></div>
+  </div>
+  <div class="copyright">© 2026 CTR Insight</div>
+</footer>
+
+</body>
+</html>

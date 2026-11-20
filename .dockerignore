@@ -1,0 +1,23 @@
+# 构建镜像时排除这些目录/文件，避免把本地环境打进镜像
+.git
+.gitignore
+
+# Python 本地环境（镜像内重新装）
+venv/
+vendor/
+__pycache__/
+*.pyc
+
+# 本地数据与模型产物（运行时用 volume 挂载，不打进镜像）
+data/
+model/
+
+# 文档/脚本（.sh/.bat 是本地开发用，镜像里用不到）
+*.sh
+*.bat
+docs/
+scripts/
+
+# 系统文件
+.DS_Store
+Thumbs.db

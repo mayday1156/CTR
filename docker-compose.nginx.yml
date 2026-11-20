@@ -1,0 +1,37 @@
+# Ali-CTR Lab Docker Compose（含 Nginx 反代，可选）
+# 用法：
+#   docker compose -f docker-compose.nginx.yml up -d
+# 说明：
+#   - 在 Nginx 容器前挂证书目录，实现 HTTPS
+#   - 证书可用 certbot 申请后放到 ./deploy/certs/ 下
+#
+# 大多数情况直接用根目录 docker-compose.yml 即可，只有需要
+# 容器化 Nginx + HTTPS 时才用这个文件。
+
+services:
+  app:
+    build: .
+    image: ali-ctr-lab:latest
+    container_name: ali-ctr-lab
+    restart: unless-stopped
+    expose:
+      - "8000"
+    environment:
+      ALI_CCP_HOST: "0.0.0.0"
+      ALI_CCP_PORT: "8000"
+    volumes:
+      - ./data:/app/data
+      - ./model:/app/model
+
+  nginx:
+    image: nginx:stable-alpine
+    container_name: ali-ctr-lab-nginx
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./deploy/certs:/etc/letsencrypt:ro   # 证书目录（certbot 产出后放这里）

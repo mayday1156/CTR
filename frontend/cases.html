@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>客户案例 · CTR Insight</title>
+<link rel="stylesheet" href="/ui/assets/site.css">
+<style>
+  .case-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 32px; margin-bottom: 24px; transition: .2s; }
+  .case-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+  .case-card .tag-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .case-card h3 { font-size: 20px; margin-bottom: 10px; }
+  .case-card p { color: var(--text-secondary); font-size: 14px; line-height: 1.7; }
+  .case-card .metrics { display: flex; gap: 32px; margin-top: 20px; flex-wrap: wrap; }
+  .case-card .metrics .m .num { font-size: 24px; font-weight: 800; color: var(--primary); }
+  .case-card .metrics .m .lab { font-size: 12px; color: var(--text-muted); }
+  .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px;
+    background: var(--primary-soft); color: var(--primary); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="inner">
+    <a class="brand" href="/ui/"><span class="logo">C</span><span>CTR Insight</span></a>
+    <div class="nav-links">
+      <a href="/ui/">首页</a>
+      <a href="/ui/features.html">产品功能</a>
+      <a href="/ui/cases.html" class="active">客户案例</a>
+      <a href="/ui/blog.html">博客</a>
+      <a href="/ui/pricing.html">定价</a>
+      <a href="/ui/docs.html">文档</a>
+      <a href="/ui/about.html">关于</a>
+      <a href="/ui/app.html" class="nav-cta btn btn-primary btn-sm">进入工作台 →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container" style="padding-top:64px; padding-bottom:64px;">
+  <h1 class="section-title" style="font-size:40px;">客户案例</h1>
+  <p class="section-sub">看看团队如何用 CTR Insight 提升广告投放效率与点击率预估精度。</p>
+
+  <div class="case-card">
+    <div class="tag-row"><span class="badge">电商广告</span><span class="badge">CTR 预估</span></div>
+    <h3>某头部电商：广告点击率预估精度提升 18%</h3>
+    <p>该平台每天产生数千万次广告曝光，点击率预估直接影响竞价策略与营收。接入 CTR Insight 后，团队基于 DeepFM 模型重构了 CTR 预估链路，
+      通过多维特征交叉（用户行为序列 × 商品类目 × 广告位）显著提升了模型区分度，AUC 从 0.61 提升至 0.72。</p>
+    <div class="metrics">
+      <div class="m"><div class="num">+18%</div><div class="lab">预估精度</div></div>
+      <div class="m"><div class="num">0.72</div><div class="lab">CTR AUC</div></div>
+      <div class="m"><div class="num">5000万</div><div class="lab">日曝光样本</div></div>
+    </div>
+  </div>
+
+  <div class="case-card">
+    <div class="tag-row"><span class="badge">信息流</span><span class="badge">转化率</span></div>
+    <h3>某资讯平台：双任务建模提升转化识别</h3>
+    <p>信息流场景点击与转化高度相关，团队利用 CTR + CVR 双任务建模（ESMM 思路）联动优化，
+      借助漏斗分析与行为序列长度分布，定位到低转化类目，定向优化后整体 CVR 提升 12%。</p>
+    <div class="metrics">
+      <div class="m"><div class="num">+12%</div><div class="lab">整体转化率</div></div>
+      <div class="m"><div class="num">2.4×</div><div class="lab">高价值用户识别</div></div>
+    </div>
+  </div>
+
+  <div class="case-card">
+    <div class="tag-row"><span class="badge">数据团队</span><span class="badge">数据洞察</span></div>
+    <h3>某增长团队：从零到一的可视化分析工作台</h3>
+    <p>团队此前依赖离线脚本产出周报，效率低且难以交互。迁移到 CTR Insight 后，
+      数据分析师可直接在网页上做多维交叉下钻、漏斗追踪与字段覆盖率诊断，报告产出时间从 2 天缩短到 2 小时。</p>
+    <div class="metrics">
+      <div class="m"><div class="num">24×</div><div class="lab">报告产出提速</div></div>
+      <div class="m"><div class="num">-90%</div><div class="lab">重复劳动</div></div>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="inner">
+    <div class="col"><a class="brand" href="/ui/"><span class="logo">C</span><span>CTR Insight</span></a></div>
+    <div class="col"><h4>产品</h4><a href="/ui/features.html">产品功能</a><a href="/ui/pricing.html">定价</a><a href="/ui/app.html">工作台</a></div>
+    <div class="col"><h4>资源</h4><a href="/ui/cases.html">客户案例</a><a href="/ui/blog.html">博客</a><a href="/ui/docs.html">文档</a></div>
+  </div>
+  <div class="copyright">© 2026 CTR Insight</div>
+</footer>
+
+</body>
+</html>
